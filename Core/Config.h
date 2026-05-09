@@ -423,6 +423,7 @@ public:
 	int iShowStatusFlags;
 	bool bShowRegionOnGameIcon;
 	bool bShowIDOnGameIcon;
+	bool bShowTitleOnGameIcon;
 	float fGameGridScale;
 	int iBackgroundAnimation;  // enum BackgroundAnimation
 	bool bTransparentBackground;

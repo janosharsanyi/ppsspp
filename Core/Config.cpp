@@ -275,6 +275,7 @@ static const ConfigSetting generalSettings[] = {
 
 	ConfigSetting("ShowRegionOnGameIcon", SETTING(g_Config, bShowRegionOnGameIcon), false, CfgFlag::DEFAULT),
 	ConfigSetting("ShowIDOnGameIcon", SETTING(g_Config, bShowIDOnGameIcon), false, CfgFlag::DEFAULT),
+	ConfigSetting("ShowTitleOnGameIcon", SETTING(g_Config, bShowTitleOnGameIcon), false, CfgFlag::DEFAULT),
 	ConfigSetting("GameGridScale", SETTING(g_Config, fGameGridScale), &DefaultGameGridScale, CfgFlag::DEFAULT),
 	ConfigSetting("GridView1", SETTING(g_Config, bGridView1), true, CfgFlag::DEFAULT),
 	ConfigSetting("GridView2", SETTING(g_Config, bGridView2), true, CfgFlag::DEFAULT),

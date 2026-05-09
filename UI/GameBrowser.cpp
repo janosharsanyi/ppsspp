@@ -352,6 +352,64 @@ void GameButton::Draw(UIContext &dc) {
 		dc.SetFontScale(1.0f, 1.0f);
 	}
 
+	if (gridStyle_ && g_Config.bShowTitleOnGameIcon) {
+		std::string title = ReplaceAll(ginfo->GetTitle(), "\n", " ");
+		if (!title.empty()) {
+			// Reserve space for whichever corner overlays are visible, so the title's
+			// bounce window stops cleanly at their edges rather than scrolling under them.
+			// We re-fetch the atlas images here; the duplicate lookups are cheap (hashmap)
+			// and let us avoid hoisting the region-icon table to file scope.
+			float leftPad = 0.0f, rightPad = 0.0f;
+			if (ginfo->hasConfig && !ginfo->id.empty()) {
+				const AtlasImage *gearImage = dc.Draw()->GetAtlas()->getImage(ImageID("I_GEAR_SMALL"));
+				if (gearImage)
+					leftPad = gearImage->w * g_Config.fGameGridScale + 2.0f;
+			}
+			const int regionIndex = (int)ginfo->region;
+			if (g_Config.bShowRegionOnGameIcon && regionIndex >= 0 && regionIndex < (int)GameRegion::COUNT) {
+				const ImageID regionIcons[(int)GameRegion::COUNT] = {
+					ImageID("I_FLAG_JP"),
+					ImageID("I_FLAG_US"),
+					ImageID("I_FLAG_EU"),
+					ImageID("I_FLAG_HK"),
+					ImageID("I_FLAG_AS"),
+					ImageID("I_FLAG_KO"),
+				};
+				const AtlasImage *flagImage = dc.Draw()->GetAtlas()->getImage(regionIcons[regionIndex]);
+				if (flagImage)
+					rightPad = (flagImage->w + 5) * g_Config.fGameGridScale + 2.0f;
+			}
+
+			float scale = 0.5f * g_Config.fGameGridScale;
+			dc.SetFontScale(scale, scale);
+
+			float winLeft = (float)x + leftPad;
+			float winW = std::max(0.0f, (float)w - leftPad - rightPad);
+
+			float tw, th;
+			dc.MeasureText(dc.GetFontStyle(), scale, scale, title, &tw, &th, 0);
+
+			dc.PushScissor(Bounds(winLeft, (float)y, winW, (float)h));
+
+			float ty = (float)(y + h) - 4.0f * g_Config.fGameGridScale;
+			if (tw <= winW) {
+				// Fits — center inside the available window.
+				float tx = winLeft + winW * 0.5f;
+				dc.DrawText(title, tx + 1, ty + 1, 0xFF000000, ALIGN_BOTTOM | ALIGN_HCENTER);
+				dc.DrawText(title, tx, ty, dc.GetTheme().infoStyle.fgColor, ALIGN_BOTTOM | ALIGN_HCENTER);
+			} else {
+				// Overflows — bounce horizontally with the same sine pattern as the list view.
+				float sineWidth = (tw - winW) * 0.5f;
+				float tx = winLeft - (1.0f + sin(time_now_d() * 1.5f)) * sineWidth;
+				dc.DrawText(title, tx + 1, ty + 1, 0xFF000000, ALIGN_BOTTOMLEFT);
+				dc.DrawText(title, tx, ty, dc.GetTheme().infoStyle.fgColor, ALIGN_BOTTOMLEFT);
+			}
+			dc.Draw()->Flush();
+			dc.PopScissor();
+			dc.SetFontScale(1.0f, 1.0f);
+		}
+	}
+
 	if (imageIcon.isValid()) {
 		Style style = dc.GetTheme().itemStyle;
 

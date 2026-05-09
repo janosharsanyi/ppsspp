@@ -900,6 +900,7 @@ void GridSettingsPopupScreen::CreatePopupContents(UI::ViewGroup *parent) {
 	items->Add(new ItemHeader(sy->T("Display Extra Info")));
 	items->Add(new CheckBox(&g_Config.bShowIDOnGameIcon, sy->T("Show ID")));
 	items->Add(new CheckBox(&g_Config.bShowRegionOnGameIcon, sy->T("Show region flag")));
+	items->Add(new CheckBox(&g_Config.bShowTitleOnGameIcon, sy->T("Show title")));
 
 	if (g_Config.iMaxRecent > 0) {
 		items->Add(new ItemHeader(sy->T("Clear Recent")));
