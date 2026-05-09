@@ -90,37 +90,6 @@ private:
 	std::vector<TextureShaderInfo> shaders_;
 };
 
-enum class AfterLogoScreen {
-	TO_GAME_SETTINGS,
-	DEFAULT,
-	MEMSTICK_SCREEN_INITIAL_SETUP,
-};
-
-class LogoScreen : public UIBaseScreen {
-public:
-	LogoScreen(AfterLogoScreen afterLogoScreen = AfterLogoScreen::DEFAULT);
-
-	bool key(const KeyInput &key) override;
-	void touch(const TouchInput &touch) override;
-	void update() override;
-	void DrawForeground(UIContext &ui) override;
-	void sendMessage(UIMessage message, const char *value) override;
-	void CreateViews() override {}
-
-	const char *tag() const override { return "Logo"; }
-
-protected:
-	ViewLayoutMode LayoutMode() const override { return ViewLayoutMode::ApplyInsets; }
-	bool UseImmersiveMode() const override { return true; }
-
-private:
-	void Next();
-	int frames_ = 0;
-	double sinceStart_ = 0.0;
-	bool switched_ = false;
-	AfterLogoScreen afterLogoScreen_;
-};
-
 class CreditsScreen : public UISimpleBaseDialogScreen {
 public:
 	CreditsScreen() : UISimpleBaseDialogScreen(Path(), SimpleDialogFlags::Default) {}

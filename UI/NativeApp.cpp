@@ -344,7 +344,6 @@ void NativeInit(int argc, const char *argv[], const char *savegame_dir, const ch
 	// Make sure UI state is MENU.
 	ResetUIState();
 
-	bool skipLogo = false;
 	setlocale( LC_ALL, "C" );
 	std::string user_data_path = savegame_dir;
 	pendingMessages.clear();
@@ -622,7 +621,6 @@ void NativeInit(int argc, const char *argv[], const char *savegame_dir, const ch
 					}
 
 					boot_filename = Path(str);
-					skipLogo = true;
 				}
 				// This is needed on iOS, to fixup the path to match the current app directory, if it's stored in it.
 				TryUpdateSavedPath(&boot_filename);
@@ -708,20 +706,25 @@ void NativeInit(int argc, const char *argv[], const char *savegame_dir, const ch
 	g_screenManager = new ScreenManager();
 	if (g_Config.memStickDirectory.empty()) {
 		INFO_LOG(Log::System, "No memstick directory! Asking for one to be configured.");
-		g_screenManager->switchScreen(new LogoScreen(AfterLogoScreen::MEMSTICK_SCREEN_INITIAL_SETUP));
+		g_screenManager->switchScreen(new MemStickScreen(true));
 	} else if (gotoGameSettings) {
-		g_screenManager->switchScreen(new LogoScreen(AfterLogoScreen::TO_GAME_SETTINGS));
+		if (!boot_filename.empty()) {
+			g_screenManager->switchScreen(new EmuScreen(boot_filename));
+		} else {
+			g_screenManager->switchScreen(new MainScreen());
+		}
+		g_screenManager->push(new GameSettingsScreen(boot_filename));
 	} else if (gotoTouchScreenTest) {
 		g_screenManager->switchScreen(new MainScreen());
 		g_screenManager->push(new TouchTestScreen(Path()));
 	} else if (gotoDeveloperTools) {
 		g_screenManager->switchScreen(new MainScreen());
 		g_screenManager->push(new DeveloperToolsScreen(Path()));
-	} else if (skipLogo && !boot_filename.empty()) {
+	} else if (!boot_filename.empty()) {
 		INFO_LOG(Log::System, "Launching EmuScreen with boot filename '%s'", boot_filename.c_str());
 		g_screenManager->switchScreen(new EmuScreen(boot_filename));
 	} else {
-		g_screenManager->switchScreen(new LogoScreen(AfterLogoScreen::DEFAULT));
+		g_screenManager->switchScreen(new MainScreen());
 	}
 
 	g_screenManager->SetBackgroundOverlayScreens(new BackgroundScreen(), new OSDOverlayScreen());
